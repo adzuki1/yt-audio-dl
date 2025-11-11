@@ -1,0 +1,9 @@
+openpyxl
+moviepy==2.0.0.dev2
+yt_dlp
+
+# os
+# re
+# queue
+# threading
+
