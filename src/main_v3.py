@@ -1,100 +1,127 @@
 import os
-import pandas as pd
-from pydub import AudioSegment
+import re
+import openpyxl
 import yt_dlp
+from moviepy.audio.io.AudioFileClip import AudioFileClip
+from queue import Queue
+from threading import Thread
 
-# Config
-BASE_DIR = os.path.expanduser("musicas")
-EXCEL_FILE = "test.xlsx"
-
-
-# Create directories from Excel file, to save each file separately
-def createDirectory(folder_name):
-    directory = os.path.join(BASE_DIR, folder_name)
-    os.makedirs(directory, exist_ok=True)
-    return directory
+# Globals
+A, B, C, D, E = 0, 1, 2, 3, 4
+download_queue = Queue()
 
 
-# Download as audio files from Youtube URLs
-def downloadAudio(url, output_path):
+def downloadAudio(yt_url, download_dir, new_folder, timestamps):
+
     try:
+        new_folder_path = os.path.join(download_dir, str(new_folder))
+        os.makedirs(new_folder_path, exist_ok=True)
+
+        # yt-dlp options
         ydl_opts = {
             'format': 'bestaudio/best',
-            'postprocessors': [{
-                'key': 'FFmpegExtractAudio',
-                'preferredcodec': 'mp3',
-                'preferredquality': '192',
-            }],
-            'outtmpl': f'{output_path}/%(title)s.%(ext)s',
-            'quiet': False,
-            'no_warnings': True,
-        }
+            'outtmpl': os.path.join(new_folder_path, '%(title)s.%(ext)s'),
+            'postprocessors': [
+                {'key': 'FFmpegExtractAudio',
+                 'preferredcodec': 'mp3', 
+                 'preferredquality': '192'}],
+         }
 
+        # Download audio
         with yt_dlp.YoutubeDL(ydl_opts) as ydl:
-            info = ydl.extract_info(url, download=True)
-            # Return the path of the downloaded mp3 file
-            filename = os.path.join(output_path, f"{info['title']}.mp3")
-            return filename
+            info_dict = ydl.extract_info(yt_url, download=True)
+            mp3_file_path = ydl.prepare_filename(info_dict).replace('.webm', '.mp3').replace('.m4a', '.mp3')
 
-    except Exception as e:
-        print(f"Erro ao baixar {url}: {e}\n")
-        return None
+            if timestamps:
+                trimmed_output_path = os.path.join(new_folder_path, f"{info_dict['title']}_trim.mp3")
+                trimAudio(mp3_file_path, trimmed_output_path, timestamps)
+                os.remove(mp3_file_path)
+            else:
+                print(f"Download completed: {mp3_file_path}\n")
 
-
-# Parse timestamps and convert them to seconds
-def parseTimestamp(timestamp):
-    try:
-        start, end = timestamp.split(' - ')
-        start_sec = int(start.split(":")[0]) * 60 + int(start.split(":")[1])
-        end_sec = int(end.split(":")[0]) * 60 + int(end.split(":")[1])
-        return start_sec, end_sec
-    except Exception as e:
-        raise ValueError(f"Erro ao processar timestamp '{timestamp}': {e}")
+    except Exception as error:
+        print(f"Error processing {yt_url}: {error}")
 
 
-# Trim audio file based on timestamps
-def trimAudio(input_path, output_path=None, timestamp=None):
-    try:
-        start_sec, end_sec = parseTimestamp(timestamp)
-        audio = AudioSegment.from_file(input_path)
+def timestampToSeconds(timestamp):
 
-        trimmed_audio = audio[start_sec * 1000:end_sec * 1000]
-
-        # Default output_path to input_path (replace file) or append "_trimmed"
-        if output_path is None:
-            output_path = input_path.replace(".mp3", "_trimmed.mp3")
-
-        trimmed_audio.export(output_path, format="mp3")
-        print(f"Áudio cortado salvo em: {output_path}\n")
-
-    except Exception as e:
-        print(f"Erro ao cortar áudio: {e}\n")
+    match = re.match(r'(\d+):(\d+)', timestamp)
+    if match:
+        minutes, seconds = map(int, match.groups())
+        return minutes * 60 + seconds
+    return 0
 
 
-# Process each task from the Excel file
-def processTask(file_data):
-    folder_name = file_data['Nome do Aluno']
-    url = file_data['Link da música']
-    timestamp = file_data['Período da música (2min)']
+def trimAudio(file_path, output_path, timestamps):
 
-    try:
-        directory = createDirectory(folder_name)
-        audio_path = downloadAudio(url, directory)
+    audio = AudioFileClip(file_path)
+    start, end = re.findall(r'\d+:\d+', timestamps)
 
-        if audio_path and os.path.exists(audio_path):
-            trimAudio(audio_path, timestamp=timestamp)
+    start_sec = timestampToSeconds(start)
+    end_sec = min(timestampToSeconds(end), audio.duration)
+
+    trimmed_audio = audio.subclip(start_sec, end_sec)
+    trimmed_audio.write_audiofile(output_path, codec="libmp3lame")
+    trimmed_audio.close()
+    audio.close()
+
+
+def processQueue():
+
+    while True:
+        task = download_queue.get()
+        if task is None:
+            break
+
+        yt_url, download_dir, new_folder, timestamps = task
+        
+        print(f"Processing task: {yt_url} in {new_folder}")
+        
+        downloadAudio(yt_url, download_dir, new_folder, timestamps)
+        download_queue.task_done()
+
+
+def enqueueTasks(class_dir, worksheet, start_row, end_row):
+
+    for row in worksheet.iter_rows(min_row=start_row, max_row=end_row, values_only=True):
+        new_folder = row[C]
+        yt_url = row[D]
+        timestamps = row[E]
+
+        if yt_url:
+            download_queue.put((yt_url, class_dir, new_folder, timestamps))
         else:
-            print(f"Skipping {folder_name}: Failed to download or locate audio.")
-    except Exception as e:
-        print(f"Error processing {folder_name}: {e}")
+            print("Skipping empty URL")
 
 
-# Main function
 def main():
-    df = pd.read_excel(EXCEL_FILE)
 
-    for _, row in df.iterrows():
-        processTask(row)
+	# Match row numbers with directories
+    download_dirs = ["musicas"]
+    start_rows = [2]
+    end_rows = [3]
+
+    workbook = openpyxl.load_workbook("url-input4.xlsx")
+    worksheet = workbook.active
+
+    # Start the worker threads
+    worker_threads = []
+    for _ in range(4):  # Adjust the number of threads as needed
+        worker = Thread(target=processQueue)
+        worker.start()
+        worker_threads.append(worker)
+
+    # Enqueue tasks
+    for i in range(len(download_dirs)):
+        enqueueTasks(download_dirs[i], worksheet, start_rows[i], end_rows[i])
+
+    # Signal end of queue
+    for _ in worker_threads:
+        download_queue.put(None)
+
+    # Wait for all threads to finish
+    for worker in worker_threads:
+        worker.join()
 
 
 if __name__ == "__main__":

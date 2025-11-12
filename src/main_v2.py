@@ -1,12 +1,12 @@
 """
-Script: main_v2.py
 Version: 2.0
 
 Description:
-This script automates the process of downloading and trimming YouTube audio files
-based on data provided in an Excel file. It uses multithreading for task execution 
+This script automates the process of downloading and
+trimming YouTube audio files
+based on data provided in an Excel file. 
+It uses multithreading for task execution 
 via a queue, improving scalability and modularity.
-
 """
 
 # Dependencies:
