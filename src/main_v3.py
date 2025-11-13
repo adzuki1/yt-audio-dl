@@ -1,3 +1,11 @@
+# Version: 3.0
+
+# This single script automates the process of 
+# downloading and trimming some YouTube audio 
+# files from URLs provided in Excel file format. 
+# This version adds multithreading for task execution 
+# using queues and check for empty URLs.
+
 import os
 import re
 import openpyxl
@@ -6,13 +14,12 @@ from moviepy.audio.io.AudioFileClip import AudioFileClip
 from queue import Queue
 from threading import Thread
 
-# Globals
+# globals
 A, B, C, D, E = 0, 1, 2, 3, 4
 download_queue = Queue()
 
 
 def downloadAudio(yt_url, download_dir, new_folder, timestamps):
-
     try:
         new_folder_path = os.path.join(download_dir, str(new_folder))
         os.makedirs(new_folder_path, exist_ok=True)
@@ -27,7 +34,7 @@ def downloadAudio(yt_url, download_dir, new_folder, timestamps):
                  'preferredquality': '192'}],
          }
 
-        # Download audio
+        # download audio from yt URL
         with yt_dlp.YoutubeDL(ydl_opts) as ydl:
             info_dict = ydl.extract_info(yt_url, download=True)
             mp3_file_path = ydl.prepare_filename(info_dict).replace('.webm', '.mp3').replace('.m4a', '.mp3')
@@ -44,19 +51,18 @@ def downloadAudio(yt_url, download_dir, new_folder, timestamps):
 
 
 def timestampToSeconds(timestamp):
-
     match = re.match(r'(\d+):(\d+)', timestamp)
     if match:
         minutes, seconds = map(int, match.groups())
         return minutes * 60 + seconds
+
     return 0
 
 
 def trimAudio(file_path, output_path, timestamps):
-
     audio = AudioFileClip(file_path)
-    start, end = re.findall(r'\d+:\d+', timestamps)
 
+    start, end = re.findall(r'\d+:\d+', timestamps)
     start_sec = timestampToSeconds(start)
     end_sec = min(timestampToSeconds(end), audio.duration)
 
@@ -67,7 +73,6 @@ def trimAudio(file_path, output_path, timestamps):
 
 
 def processQueue():
-
     while True:
         task = download_queue.get()
         if task is None:
@@ -82,7 +87,6 @@ def processQueue():
 
 
 def enqueueTasks(class_dir, worksheet, start_row, end_row):
-
     for row in worksheet.iter_rows(min_row=start_row, max_row=end_row, values_only=True):
         new_folder = row[C]
         yt_url = row[D]
@@ -95,31 +99,30 @@ def enqueueTasks(class_dir, worksheet, start_row, end_row):
 
 
 def main():
-
-	# Match row numbers with directories
+	# match row numbers with directories
     download_dirs = ["musicas"]
     start_rows = [2]
     end_rows = [3]
 
-    workbook = openpyxl.load_workbook("url-input4.xlsx")
+    workbook = openpyxl.load_workbook("test.xlsx")
     worksheet = workbook.active
 
-    # Start the worker threads
+    # start the worker threads
     worker_threads = []
-    for _ in range(4):  # Adjust the number of threads as needed
+    for _ in range(4):
         worker = Thread(target=processQueue)
         worker.start()
         worker_threads.append(worker)
 
-    # Enqueue tasks
+    # enqueue tasks
     for i in range(len(download_dirs)):
         enqueueTasks(download_dirs[i], worksheet, start_rows[i], end_rows[i])
 
-    # Signal end of queue
+    # signal end of queue
     for _ in worker_threads:
         download_queue.put(None)
 
-    # Wait for all threads to finish
+    # wait for all threads to finish
     for worker in worker_threads:
         worker.join()
 

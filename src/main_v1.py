@@ -55,7 +55,6 @@ def downloadAudio(yt_url, download_dir, new_folder, timestamps):
 
 
 def timestampToSeconds(timestamp):
-
     # convert timestamp from str to int seconds
     match = re.match(r'(\d+):(\d+)', timestamp)
 
@@ -67,7 +66,6 @@ def timestampToSeconds(timestamp):
 
 
 def trimAudio(file_path, output_path, timestamps):
-
     # get audio file
     audio = AudioFileClip(file_path)
 
