@@ -1,9 +1,12 @@
+# -----------------------------------------------------
+
 # Version: 1.0
 
 # This single script automates the process of 
 # downloading and trimming some YouTube audio 
 # files from URLs provided in Excel file format.
 
+# -----------------------------------------------------
 
 import os
 import openpyxl

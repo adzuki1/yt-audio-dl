@@ -1,3 +1,5 @@
+# -----------------------------------------------------
+
 # Version: 2.0
 
 # This single script automates the process of 
@@ -5,6 +7,8 @@
 # files from URLs provided in Excel file format. 
 # This version adds multithreading for task execution 
 # using queues.
+
+# -----------------------------------------------------
 
 import os
 import openpyxl

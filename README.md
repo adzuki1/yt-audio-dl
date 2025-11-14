@@ -4,18 +4,18 @@
 
 # EN
 
-This repository contains a Python script that:
-- Download audio from YouTube URLs provided in XLSX file.
-- Create audio clips using timestamps provided in XLSX file.
-- Organize the output into specified folders.
+This repository contains a Python program that:
+- Download audio from YouTube URLs provided in an XLSX file sheet.
+- Create audio clips using timestamps provided in the XLSX file sheet.
+- Organize the output into just created specified folders, also defined in the XLSX file sheet.
 
 #  VERSION 1
 
 ## Features
 
 - Download audio clips from YouTube URLs in MP3 format.
-- Organize downloads into folders specified in XLSX file.
-- Automated batch processing of tasks defined in XLSX file.
+- Organize downloads into folders specified in the XLSX file.
+- Automated batch processing of tasks defined in the XLSX file.
 
 ## Dependencies
 
@@ -39,12 +39,11 @@ pip install -r requirements.txt
 
 - **`main_v1.py`**: The main script for executing the tasks.
 - **`test.xlsx`**: An XLSX file used to configure download tasks.
-- **`DOWNLOADS`**: Default directory where output files are saved.
+- **`DOWNLOADS`**: Default directory (defined in `main()`) where output files are saved.
 
 ## XLSX Sheet Configuration
 
-This program processes tasks from an XLSX file. I choose to get data as following:
-
+This program processes tasks from an XLSX file. reading data as follows:
 | Column | Description                    |
 | ------ | ------------------------------ |
 | C      | Folder Name                    |
@@ -71,6 +70,10 @@ This program processes tasks from an XLSX file. I choose to get data as followin
 
 ## Notes
 - Ensure `FFmpeg` is installed and accessible in your system's PATH for audio processing.
+	- If not, on Debian/Ubuntu, run:
+```bash
+sudo apt install ffmpeg
+```
 - Tasks with empty YouTube URLs will be skipped.
 - If no timestamps are provided, the entire audio file will be downloaded without trimming.
 
@@ -79,33 +82,29 @@ This program processes tasks from an XLSX file. I choose to get data as followin
 # VERSION 2
 
 ## Overview
-This script, `main_v2.py`, is an enhancement of version 1, introducing multithreading using a queue to manage tasks. While it provides better scalability and modularity, it includes some bugs and limitations that need attention.
+This script, `main_v2.py`, is an enhancement of version 1, introducing multithreading using a `Queue` to manage tasks. This allows multiple downloads to occur concurrently.
 
-## Improvements from Version 1
-- **Multithreading**: Version 2 introduces multithreading for improved scalability, allowing the script to handle multiple tasks concurrently. The `Queue` module and `Thread` class are used to manage task execution.
-- **Worker Threads**: A configurable number of threads (default: 4) can be spawned to process tasks from the queue.
-- **Task Queue**: Tasks are added to a queue and processed independently by each thread.
-- **Error Handling**: Includes basic error handling mechanisms for downloads and audio processing.
+## Improvements from V1
+- **Multithreading**: V2 introduces multithreading for improved concurrency, allowing the script to handle multiple tasks concurrently. The `Queue` module and `Thread` class are used to manage task execution.
+- **Worker Threads**: A configurable number of threads (default: 4) are spawned to process tasks from the queue.
+- **Task Queue**: Tasks are read from the XLSX file and added to a central queue, where worker threads pick them up.
 - **Improved Modularity**: Functions like `processQueue` and `main` are structured for better readability and reusability.
 
 
 ## Limitations and Known Issues
-- **Task Counter**: The "Processing task" counter is not thread-safe, leading to possible misreporting of task indices.
-- **Error with `None` Task**: Threads log errors when encountering the termination signal (`None`) due to attempting to process it as a task. This does not impact functionality but generates unnecessary log messages.
-- **Sequential Downloads Per Thread**: While multithreading improves concurrency, each thread still processes tasks sequentially, limiting full parallel download performance.
+- **Task Counter**: The "Processing task" counter is local to each thread (counter = 0 is inside processQueue). This means the count is not sequential for the total job and will reset for each thread, leading to possible misreporting of task indices.
+- **Global Directory**: This version relies on a global variable (download_dir) for the output path, limiting flexibility.
 
 
 ## Installation and Usage
 
 ### Dependencies
 Ensure the following Python libraries are installed:
-- `os`
 - `openpyxl`
-- `re`
 - `moviepy`
-- `queue`
-- `threading`
 - `yt_dlp`
+
+(The script also uses the built-in `os`, `re`, `queue`, and `threading` modules.)
 
 Install dependencies using pip:
 ```bash
@@ -114,13 +113,16 @@ pip install openpyxl moviepy yt-dlp
 
 ### Configuration
 **Thread Count**:
-   - Adjust the `num_threads` variable in the `main` function based on your system's capability.
+   - Adjust the `num_threads` variable in the `main` function based on your system's capability  and network bandwidth.
 
 ## Notes
 This version works for small-scale tasks but may require further refinements for production use or high-concurrency scenarios.
 
+## Version History
+- **Version 1.0**: Initial implementation with sequential (single-threaded) task execution.
+- **Version 2.0**: Added multithreading and queue-based task management.
+
 ---
 
-## Version History
-- **Version 1.0**: Initial implementation with sequential task execution.
-- **Version 2.0**: Added multithreading and queue-based task management.
+# VERSION 3
+
