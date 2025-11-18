@@ -60,7 +60,6 @@ def downloadAudio(yt_url, download_dir, new_folder, timestamps):
 
 
 def timestampToSeconds(timestamp):
-
 	match = re.match(r'(\d+):(\d+)', timestamp)
 
 	if match:
@@ -71,13 +70,12 @@ def timestampToSeconds(timestamp):
 
 
 def trimAudio(file_path, output_path, timestamps):
-
 	audio = AudioFileClip(file_path)
 	start, end = re.findall(r'\d+:\d+', timestamps)
 	start_sec = timestampToSeconds(start)
 	end_sec = min(timestampToSeconds(end), audio.duration)
     
-	trimmed_audio = audio.subclip(start_sec, end_sec)
+	trimmed_audio = audio.subclipped(start_sec, end_sec)
 	trimmed_audio.write_audiofile(output_path, codec="libmp3lame")
 
 	trimmed_audio.close()
@@ -85,7 +83,6 @@ def trimAudio(file_path, output_path, timestamps):
 
 
 def processQueue():
-
 	while True:
 		task = download_queue.get()
 
@@ -93,7 +90,6 @@ def processQueue():
 			break
 
 		yt_url, download_dir, new_folder, timestamps = task
-
 		print(f"Processing task: {yt_url} in {new_folder}")
 
 		downloadAudio(yt_url, download_dir, new_folder, timestamps)
@@ -101,7 +97,6 @@ def processQueue():
 
 
 def enqueueTasks(class_dir, worksheet, start_row, end_row):
-
 	for row in worksheet.iter_rows(min_row=start_row, max_row=end_row, values_only=True):
 		new_folder = row[C]
 		yt_url = row[D]

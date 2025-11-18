@@ -46,7 +46,6 @@ def timestampToSeconds(timestamp):
 
 
 def downloadAudio(yt_url, download_dir, new_folder, timestamps):
-
 	try:
 		new_folder_path = os.path.join(download_dir, str(new_folder))
 		os.makedirs(new_folder_path, exist_ok=True)

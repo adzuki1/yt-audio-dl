@@ -2,10 +2,10 @@ Execution Log
 ==================================================
 WARNING: Skipping empty URL in row None
 WARNING: Skipping empty URL in row None
-ERROR: https://youtu.be/7Gbg6Z70J7E - 'AudioFileClip' object has no attribute 'subclip'
-ERROR: https://youtu.be/34ZmKbe5oG4?si=-QmXOiPwwzLGBbo- - 'AudioFileClip' object has no attribute 'subclip'
-ERROR: https://youtu.be/bKDdT_nyP54?si=k2IXmNN2-GEZK5HB - 'AudioFileClip' object has no attribute 'subclip'
-ERROR: https://youtu.be/Wa5B22KAkEk?si=C89_GNk0NGCITd32 - 'AudioFileClip' object has no attribute 'subclip'
-ERROR: https://youtu.be/393C3pr2ioY?feature=shared - 'AudioFileClip' object has no attribute 'subclip'
-ERROR: https://youtu.be/iW2FUY3N-n0?si=tzrY7eQk_Dlh71RK - 'AudioFileClip' object has no attribute 'subclip'
-ERROR: https://youtu.be/5TlZeem3FU8?feature=shared - 'AudioFileClip' object has no attribute 'subclip'
+SUCCESS: Trimmed audio saved: downloads/Dummy-3/Taylor Swift - You're On Your Own, Kid (Official Lyric Video)_trim.mp3
+SUCCESS: Trimmed audio saved: downloads/Dummy-4/Another Brick in the Wall (Part 2) - Pink Floyd_trim.mp3
+SUCCESS: Trimmed audio saved: downloads/Dummy-2/Akon - Smack That (Official Music Video) ft. Eminem_trim.mp3
+SUCCESS: Trimmed audio saved: downloads/Dummy-1/Snoop Dogg & Wiz Khalifa - Young, Wild and Free ft. Bruno Mars [Official Video]_trim.mp3
+SUCCESS: Trimmed audio saved: downloads/Dummy-7/Post Malone - "Wow." (Official Music Video)_trim.mp3
+SUCCESS: Trimmed audio saved: downloads/Dummy-6/Rhymes Like Dimes_trim.mp3
+SUCCESS: Trimmed audio saved: downloads/Dummy-5/The Greatest Showman Cast - From Now On (Official Audio)_trim.mp3
