@@ -5,7 +5,8 @@ import yt_dlp
 import threading
 from moviepy.audio.io.AudioFileClip import AudioFileClip
 from queue import Queue
-from threading import Thread
+from threading import Thread, Lock # Adicionado Lock
+from datetime import datetime
 
 # Globals
 A, B, C, D, E = 0, 1, 2, 3, 4
@@ -66,14 +67,14 @@ def downloadAudio(yt_url, download_dir, new_folder, timestamps):
 			mp3_file_path = ydl.prepare_filename(info_dict).replace('.webm', '.mp3').replace('.m4a', '.mp3')
 
 			if timestamps:
-				trimmed_output_path = os.path.join(new_folder_path, f"{info_dict['title'] _trim.mp3")
+				trimmed_output_path = os.path.join(new_folder_path, f"{info_dict['title']}_trim.mp3")
 				trimAudio(mp3_file_path, trimmed_output_path, timestamps)
 				os.remove(mp3_file_path)
 
 				with log_lock:
 					log_entries.append(f"SUCCESS: Trimmed audio saved: {trimmed_output_path}")
 			else:
-				wth log_lock:
+				with log_lock:
 					log_entries.append(f"SUCCESS: Download completed: {mp3_file_path}")
 
 	except Exception as error:

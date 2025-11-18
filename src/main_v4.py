@@ -114,9 +114,13 @@ def enqueueTasks(class_dir, worksheet, start_row, end_row):
 
 
 def main():
-	download_dirs = ["musicas/3001", "musicas/3002", "musicas/3003"]
-	start_rows = [2, 27, 55]
-	end_rows = [26, 54, 85]
+#	download_dirs = ["musicas/3001", "musicas/3002", "musicas/3003"]
+#	start_rows = [2, 27, 55]
+#	end_rows = [26, 54, 85]
+	download_dirs = ["downloads"]
+	start_rows = [2]
+	end_rows = [10]
+
 
 	workbook = openpyxl.load_workbook("test.xlsx")
 	worksheet = workbook.active
