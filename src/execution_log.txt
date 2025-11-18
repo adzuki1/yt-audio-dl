@@ -6,6 +6,6 @@ SUCCESS: Trimmed audio saved: downloads/Dummy-3/Taylor Swift - You're On Your Ow
 SUCCESS: Trimmed audio saved: downloads/Dummy-4/Another Brick in the Wall (Part 2) - Pink Floyd_trim.mp3
 SUCCESS: Trimmed audio saved: downloads/Dummy-2/Akon - Smack That (Official Music Video) ft. Eminem_trim.mp3
 SUCCESS: Trimmed audio saved: downloads/Dummy-1/Snoop Dogg & Wiz Khalifa - Young, Wild and Free ft. Bruno Mars [Official Video]_trim.mp3
-SUCCESS: Trimmed audio saved: downloads/Dummy-7/Post Malone - "Wow." (Official Music Video)_trim.mp3
 SUCCESS: Trimmed audio saved: downloads/Dummy-6/Rhymes Like Dimes_trim.mp3
+SUCCESS: Trimmed audio saved: downloads/Dummy-7/Post Malone - "Wow." (Official Music Video)_trim.mp3
 SUCCESS: Trimmed audio saved: downloads/Dummy-5/The Greatest Showman Cast - From Now On (Official Audio)_trim.mp3
