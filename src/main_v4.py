@@ -13,7 +13,6 @@ log_entries = []
 
 
 def writeLog():
-
 	log_file = "execution_log.txt"
 
 	with open(log_file, "w") as log:
@@ -27,7 +26,6 @@ def writeLog():
 
 
 def downloadAudio(yt_url, download_dir, new_folder, timestamps):
-
 	try:
 		new_folder_path = os.path.join(download_dir, str(new_folder))
 		os.makedirs(new_folder_path, exist_ok=True)
@@ -115,7 +113,6 @@ def main():
 	download_dirs = ["downloads"]
 	start_rows = [2]
 	end_rows = [10]
-
 
 	workbook = openpyxl.load_workbook("test.xlsx")
 	worksheet = workbook.active
