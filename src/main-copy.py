@@ -8,7 +8,7 @@ from threading import Thread
 
 # Globals
 A, B, C, D, E = 0, 1, 2, 3, 4
-download_queue = Queue()
+dl_queue = Queue()
 log_entries = []
 
 
@@ -80,9 +80,9 @@ def trimAudio(file_path, output_path, timestamps):
 	audio.close()
 
 
-def processQueue():
+def worker():
 	while True:
-		task = download_queue.get()
+		task = dl_queue.get()
 
 		if task is None:
 			break
@@ -91,7 +91,7 @@ def processQueue():
 		print(f"Processing task: {yt_url} in {new_folder}")
 
 		downloadAudio(yt_url, download_dir, new_folder, timestamps)
-		download_queue.task_done()
+		dl_queue.task_done()
 
 
 def enqueueTasks(path, worksheet, start_row, end_row):
@@ -103,7 +103,7 @@ def enqueueTasks(path, worksheet, start_row, end_row):
 		timestamps = row[E]
 
 		if yt_url:
-			download_queue.put((yt_url, path, new_folder, timestamps))
+			dl_queue.put((yt_url, path, new_folder, timestamps))
 		else:
 			log_entries.append(f"WARNING: Skipping empty URL in row {row[A]}")
 
@@ -113,32 +113,33 @@ def main():
 	start_rows = [2]
 	end_rows = [10]
 
-	workbook = openpyxl.load_workbook("xtra.xlsx")
-	worksheet = workbook.active
+	# open XLSX
+	wb = openpyxl.load_workbook("xtra.xlsx")
+	worksheet = wb.active
 
-    # Start the worker threads
-	worker_threads = []
+    # start the worker threads
+	w_threads = []
     
-	n_threads = 10 # Adjust the number of threads as needed
+	n_threads = 10 # adjust the number of threads as needed
 
 	for _ in range(n_threads):
-		worker = Thread(target=processQueue)
-		worker.start()
-		worker_threads.append(worker)
+		w = Thread(target=worker)
+		w.start()
+		w_threads.append(w)
 
-    # Enqueue tasks
+    # enqueue tasks
 	for i in range(len(dl_path)):
 		enqueueTasks(dl_path[i], worksheet, start_rows[i], end_rows[i])
 
-    # Signal end of queue
-	for _ in worker_threads:
-		download_queue.put(None)
+    # signal end of queue
+	for _ in w_threads:
+		dl_queue.put(None)
 
-    # Wait for all threads to finish
-	for worker in worker_threads:
-		worker.join()
+    # wait for all threads to finish
+	for w in w_threads:
+		w.join()
 
-    # Write the log file
+    # write the log file
 	writeLog()
 
 
