@@ -7,5 +7,5 @@ WARNING: Skipping empty URL in row None
 WARNING: Skipping empty URL in row None
 WARNING: Skipping empty URL in row None
 WARNING: Skipping empty URL in row None
-WARNING: Skipping empty URL in row None
-SUCCESS: Trimmed audio saved: xtra/Manuela-Franco-Fernandes-Passetti/Kendrick Lamar, SZA - All The Stars_trim.mp3
+SUCCESS: Trimmed audio saved: musicas/Ana-Clara-de-Melo-Ferreira/Força Jovem do Vasco_trim.mp3
+SUCCESS: Trimmed audio saved: musicas/Miguel-Felix-Liberato-Fernandes-de-Oliveira/Mumuzinho - Eu Mereço Ser Feliz (Ao Vivo)_trim.mp3

@@ -107,11 +107,11 @@ def enqueueTasks(class_dir, worksheet, start_row, end_row):
 
 
 def main():
-	download_dirs = ["musicas/3001", "musicas/3002", "musicas/3003"]
-	start_rows = [2, 40, 74]
-	end_rows = [38, 72, 104]
+	download_dirs = ["musicas"]
+	start_rows = [2]
+	end_rows = [10]
 
-	workbook = openpyxl.load_workbook("yt-dl-formatura.xlsx")
+	workbook = openpyxl.load_workbook("dl-extra.xlsx")
 	worksheet = workbook.active
 
     # Start the worker threads
